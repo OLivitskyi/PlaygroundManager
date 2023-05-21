@@ -1,4 +1,4 @@
-package org.example.Dto;
+package org.example.playground.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class KidDTO {
+public class Kid {
     private String name;
     private int age;
     private int ticketNumber;

@@ -1,6 +1,5 @@
-package org.example.Domain;
+package org.example.playground.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -1,7 +1,7 @@
-package org.example.Interfaces;
+package org.example.playground.interfaces;
 
-import org.example.Domain.Kid;
-import org.example.Domain.PlaySite;
+import org.example.playground.domain.Kid;
+import org.example.playground.domain.PlaySite;
 
 import java.util.List;
 

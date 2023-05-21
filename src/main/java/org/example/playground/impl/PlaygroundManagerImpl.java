@@ -1,8 +1,8 @@
-package org.example.Impl;
+package org.example.playground.impl;
 
-import org.example.Domain.Kid;
-import org.example.Domain.PlaySite;
-import org.example.Interfaces.PlaygroundManager;
+import org.example.playground.domain.Kid;
+import org.example.playground.domain.PlaySite;
+import org.example.playground.interfaces.PlaygroundManager;
 import org.springframework.stereotype.Component;
 
 import java.util.*;

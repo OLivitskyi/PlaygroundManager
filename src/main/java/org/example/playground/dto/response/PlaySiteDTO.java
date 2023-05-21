@@ -1,4 +1,4 @@
-package org.example.Dto;
+package org.example.playground.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

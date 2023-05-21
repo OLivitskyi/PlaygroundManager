@@ -1,8 +1,8 @@
-import org.example.Controller.PlaygroundController;
-import org.example.Domain.PlaySite;
-import org.example.Dto.PlaySiteDTO;
-import org.example.Dto.PlaySiteRequest;
-import org.example.Interfaces.PlaygroundManager;
+import org.example.playground.controller.PlaygroundController;
+import org.example.playground.domain.PlaySite;
+import org.example.playground.dto.response.PlaySiteDTO;
+import org.example.playground.dto.request.PlaySiteRequest;
+import org.example.playground.interfaces.PlaygroundManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

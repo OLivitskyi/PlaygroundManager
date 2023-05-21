@@ -1,12 +1,13 @@
-package org.example.Controller;
+package org.example.playground.controller;
 
-import org.example.Domain.Kid;
-import org.example.Domain.PlaySite;
-import org.example.Dto.KidDTO;
-import org.example.Dto.PlaySiteDTO;
-import org.example.Dto.PlaySiteRequest;
-import org.example.Interfaces.PlaygroundManager;
+import org.example.playground.domain.Kid;
+import org.example.playground.domain.PlaySite;
+import org.example.playground.dto.request.KidRequest;
+import org.example.playground.dto.response.PlaySiteDTO;
+import org.example.playground.dto.request.PlaySiteRequest;
+import org.example.playground.interfaces.PlaygroundManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class PlaygroundController {
     private PlaygroundManager playgroundManager;
 
     @PostMapping("/playSites")
+    @ResponseStatus(HttpStatus.CREATED)
     public PlaySiteDTO createPlaySite(@RequestBody PlaySiteRequest playSiteRequest) {
         PlaySite playSite = playgroundManager.createPlaySite(playSiteRequest.getName(),
                 playSiteRequest.getCapacity(),
@@ -49,25 +51,27 @@ public class PlaygroundController {
     }
 
     @PostMapping("/playSites/{id}/kids")
-    public void addKidToPlaySite(@PathVariable("id") String playSiteId, @RequestBody KidDTO kidDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addKidToPlaySite(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidDto) {
         Kid kid = convertToKid(kidDto);
         playgroundManager.addKidToPlaySite(playSiteId, kid);
     }
 
     @DeleteMapping("/playSites/{id}/kids")
-    public void removeKidFromPlaySite(@PathVariable("id") String playSiteId, @RequestBody KidDTO kidDto) {
+    public void removeKidFromPlaySite(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidDto) {
         Kid kid = convertToKid(kidDto);
         playgroundManager.removeKidFromPlaySite(playSiteId, kid);
     }
 
     @PostMapping("/playSites/{id}/queue")
-    public boolean enqueueKid(@PathVariable("id") String playSiteId, @RequestBody KidDTO kidDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public boolean enqueueKid(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidDto) {
         Kid kid = convertToKid(kidDto);
         return playgroundManager.enqueueKid(playSiteId, kid);
     }
 
     @DeleteMapping("/playSites/{id}/queue")
-    public void removeKidFromQueue(@PathVariable("id") String playSiteId, @RequestBody KidDTO kidDto) {
+    public void removeKidFromQueue(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidDto) {
         Kid kid = convertToKid(kidDto);
         playgroundManager.removeKidFromQueue(playSiteId, kid);
     }
@@ -94,7 +98,7 @@ public class PlaygroundController {
         return playSiteDTO;
     }
 
-    private Kid convertToKid(KidDTO kidDto) {
+    private Kid convertToKid(KidRequest kidDto) {
         Kid kid = new Kid();
         kid.setName(kidDto.getName());
         kid.setAge(kidDto.getAge());
