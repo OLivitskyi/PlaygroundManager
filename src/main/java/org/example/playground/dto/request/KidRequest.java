@@ -12,5 +12,4 @@ public class KidRequest {
     private int age;
     private int ticketNumber;
     private boolean acceptsWaiting;
-
 }

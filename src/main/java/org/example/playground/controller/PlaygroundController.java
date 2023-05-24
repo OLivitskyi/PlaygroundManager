@@ -4,7 +4,6 @@ import org.example.playground.domain.Kid;
 import org.example.playground.domain.PlaySite;
 import org.example.playground.dto.request.KidRequest;
 import org.example.playground.dto.response.PlaySiteDTO;
-import org.example.playground.dto.request.PlaySiteRequest;
 import org.example.playground.interfaces.PlaygroundManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,13 +20,13 @@ public class PlaygroundController {
 
     @PostMapping("/playSites")
     @ResponseStatus(HttpStatus.CREATED)
-    public PlaySiteDTO createPlaySite(@RequestBody PlaySiteRequest playSiteRequest) {
-        PlaySite playSite = playgroundManager.createPlaySite(playSiteRequest.getName(),
-                playSiteRequest.getCapacity(),
-                playSiteRequest.getDoubleSwings(),
-                playSiteRequest.getCarousel(),
-                playSiteRequest.getSlide(),
-                playSiteRequest.getBallPit());
+    public PlaySiteDTO createPlaySite(@RequestBody PlaySiteDTO playSiteDTO) {
+        PlaySite playSite = playgroundManager.createPlaySite(playSiteDTO.getName(),
+                playSiteDTO.getCapacity(),
+                playSiteDTO.getDoubleSwings(),
+                playSiteDTO.getCarousel(),
+                playSiteDTO.getSlide(),
+                playSiteDTO.getBallPit());
         return convertToDto(playSite);
     }
 
@@ -52,27 +51,27 @@ public class PlaygroundController {
 
     @PostMapping("/playSites/{id}/kids")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addKidToPlaySite(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidDto) {
-        Kid kid = convertToKid(kidDto);
+    public void addKidToPlaySite(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidRequest) {
+        Kid kid = convertToKid(kidRequest);
         playgroundManager.addKidToPlaySite(playSiteId, kid);
     }
 
     @DeleteMapping("/playSites/{id}/kids")
-    public void removeKidFromPlaySite(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidDto) {
-        Kid kid = convertToKid(kidDto);
+    public void removeKidFromPlaySite(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidRequest) {
+        Kid kid = convertToKid(kidRequest);
         playgroundManager.removeKidFromPlaySite(playSiteId, kid);
     }
 
     @PostMapping("/playSites/{id}/queue")
     @ResponseStatus(HttpStatus.CREATED)
-    public boolean enqueueKid(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidDto) {
-        Kid kid = convertToKid(kidDto);
+    public boolean enqueueKid(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidRequest) {
+        Kid kid = convertToKid(kidRequest);
         return playgroundManager.enqueueKid(playSiteId, kid);
     }
 
     @DeleteMapping("/playSites/{id}/queue")
-    public void removeKidFromQueue(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidDto) {
-        Kid kid = convertToKid(kidDto);
+    public void removeKidFromQueue(@PathVariable("id") String playSiteId, @RequestBody KidRequest kidRequest) {
+        Kid kid = convertToKid(kidRequest);
         playgroundManager.removeKidFromQueue(playSiteId, kid);
     }
 
@@ -98,12 +97,12 @@ public class PlaygroundController {
         return playSiteDTO;
     }
 
-    private Kid convertToKid(KidRequest kidDto) {
+    private Kid convertToKid(KidRequest kidRequest) {
         Kid kid = new Kid();
-        kid.setName(kidDto.getName());
-        kid.setAge(kidDto.getAge());
-        kid.setTicketNumber(kidDto.getTicketNumber());
-        kid.setAcceptsWaiting(kidDto.isAcceptsWaiting());
+        kid.setName(kidRequest.getName());
+        kid.setAge(kidRequest.getAge());
+        kid.setTicketNumber(kidRequest.getTicketNumber());
+        kid.setAcceptsWaiting(kidRequest.isAcceptsWaiting());
         return kid;
     }
 }
