@@ -87,13 +87,9 @@ public class PlaygroundController {
 
     private PlaySiteDTO convertToDto(PlaySite playSite) {
         PlaySiteDTO playSiteDTO = new PlaySiteDTO();
-        playSiteDTO.setId(playSite.getId());
+        playSiteDTO.setId(playSite.getId().toString());
         playSiteDTO.setName(playSite.getName());
         playSiteDTO.setCapacity(playSite.getCapacity());
-        playSiteDTO.setDoubleSwings(playSite.getDoubleSwings());
-        playSiteDTO.setCarousel(playSite.getCarousel());
-        playSiteDTO.setSlide(playSite.getSlide());
-        playSiteDTO.setBallPit(playSite.getBallPit());
         return playSiteDTO;
     }
 

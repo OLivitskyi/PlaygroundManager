@@ -3,6 +3,7 @@ package org.example.playground.impl;
 import org.example.playground.domain.Kid;
 import org.example.playground.domain.PlaySite;
 import org.example.playground.interfaces.PlaygroundManager;
+import org.example.playground.repository.KidRepository;
 import org.example.playground.repository.PlaySiteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,31 +12,57 @@ import java.util.*;
 
 @Component
 public class PlaygroundManagerImpl implements PlaygroundManager {
+    private KidRepository kidRepository;
     private PlaySiteRepository playSiteRepository;
     private int totalVisitorCount;
 
+    private static final int WAITING_TIME = 30; // Waiting time in minutes
+
     @Autowired
-    public PlaygroundManagerImpl(PlaySiteRepository playSiteRepository) {
+    public PlaygroundManagerImpl(KidRepository kidRepository, PlaySiteRepository playSiteRepository) {
+        this.kidRepository = kidRepository;
         this.playSiteRepository = playSiteRepository;
-        this.totalVisitorCount = 0;
+    }
+    @Override
+    public boolean enqueueKid(String playSiteId, Kid kid) {
+        Optional<PlaySite> optionalPlaySite = playSiteRepository.findById(playSiteId);
+        if (optionalPlaySite.isPresent()) {
+            PlaySite playSite = optionalPlaySite.get();
+            if (playSite.getKids().size() >= playSite.getCapacity()) {
+                if(kid.isAcceptsWaiting()){
+                    kid.setAcceptsWaiting(true);
+                    playSite.getQueue().add(kid);
+                    kidRepository.save(kid);  // save kid entity after adding it to the queue
+                    playSiteRepository.save(playSite);
+                    schedulePatienceTimer(playSiteId, kid);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
+
+    private void schedulePatienceTimer(String playSiteId, Kid kid) {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                removeKidFromQueue(playSiteId, kid);
+            }
+        }, WAITING_TIME * 60 * 1000);
+    }
     @Override
     public PlaySite createPlaySite(String name, int capacity, int doubleSwings, int carousel, int slide, int ballPit) {
         PlaySite playSite = new PlaySite();
-        playSite.setId(UUID.randomUUID().toString());
         playSite.setName(name);
         playSite.setCapacity(capacity);
-        playSite.setDoubleSwings(doubleSwings);
-        playSite.setCarousel(carousel);
-        playSite.setSlide(slide);
-        playSite.setBallPit(ballPit);
         playSite.setKids(new ArrayList<>());
         playSite.setQueue(new LinkedList<>());
-
         playSiteRepository.save(playSite);
         return playSite;
     }
+
 
     @Override
     public List<PlaySite> getAllPlaySites() {
@@ -53,14 +80,14 @@ public class PlaygroundManagerImpl implements PlaygroundManager {
         playSiteRepository.deleteById(id);
     }
 
-    @Override
     public void addKidToPlaySite(String playSiteId, Kid kid) {
         Optional<PlaySite> optionalPlaySite = playSiteRepository.findById(playSiteId);
         if (optionalPlaySite.isPresent()) {
             PlaySite playSite = optionalPlaySite.get();
-            if (playSite.getKids().size() < playSite.getCapacity()) {
-                playSite.getKids().add(kid);
+            boolean success = playSite.addKidToPlaySite(kid);
+            if (success) {
                 totalVisitorCount++;
+                kidRepository.save(kid);  // save kid entity after adding it
                 playSiteRepository.save(playSite);
             } else {
                 System.out.println("Play site is at full capacity. Kid cannot be added.");
@@ -68,31 +95,21 @@ public class PlaygroundManagerImpl implements PlaygroundManager {
         }
     }
 
-    @Override
+
     public void removeKidFromPlaySite(String playSiteId, Kid kid) {
         Optional<PlaySite> optionalPlaySite = playSiteRepository.findById(playSiteId);
         if (optionalPlaySite.isPresent()) {
             PlaySite playSite = optionalPlaySite.get();
-            playSite.getKids().remove(kid);
-            totalVisitorCount--;
-            playSiteRepository.save(playSite);
+            boolean success = playSite.removeKidFromPlaySite(kid);
+            if (success) {
+                totalVisitorCount--;
+                kidRepository.save(kid);  // save kid entity after removing it
+                playSiteRepository.save(playSite); // save playSite entity after removing a kid from it
+            }
         }
     }
 
-    @Override
-    public boolean enqueueKid(String playSiteId, Kid kid) {
-        Optional<PlaySite> optionalPlaySite = playSiteRepository.findById(playSiteId);
-        if (optionalPlaySite.isPresent()) {
-            PlaySite playSite = optionalPlaySite.get();
-            if (playSite.getKids().size() >= playSite.getCapacity()) {
-                kid.setAcceptsWaiting(true);
-                playSite.getQueue().offer(kid);
-                playSiteRepository.save(playSite);
-                return true;
-            }
-        }
-        return false;
-    }
+
 
     @Override
     public void removeKidFromQueue(String playSiteId, Kid kid) {
@@ -110,7 +127,7 @@ public class PlaygroundManagerImpl implements PlaygroundManager {
         if (optionalPlaySite.isPresent()) {
             PlaySite playSite = optionalPlaySite.get();
             int totalCapacity = playSite.getCapacity();
-            int currentOccupancy = playSite.getKids().size();
+            int currentOccupancy = playSite.getKids().size() + playSite.getQueue().size();
             return (double) currentOccupancy / totalCapacity * 100;
         }
         return 0;

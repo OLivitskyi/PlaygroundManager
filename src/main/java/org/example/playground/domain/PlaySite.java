@@ -1,40 +1,38 @@
 package org.example.playground.domain;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
+
+import lombok.Data;
 
 @Entity
 @Data
-@NoArgsConstructor
 public class PlaySite {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     private String name;
     private int capacity;
-    private int doubleSwings;
-    private int carousel;
-    private int slide;
-    private int ballPit;
+    private boolean hasQueue;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Kid> kids;
+    private List<Kid> kids = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    private Queue<Kid> queue;
-
-    public PlaySite(String id, String name, int capacity, int doubleSwings, int carousel, int slide, int ballPit) {
-        this.id = id;
-        this.name = name;
-        this.capacity = capacity;
-        this.doubleSwings = doubleSwings;
-        this.carousel = carousel;
-        this.slide = slide;
-        this.ballPit = ballPit;
+    private List<Kid> queue = new ArrayList<>();
+    public boolean addKidToPlaySite(Kid kid) {
+        if (this.kids.size() < this.capacity) {
+            this.kids.add(kid);
+            return true;
+        } else {
+            return false;
+        }
     }
+    public boolean removeKidFromPlaySite(Kid kid) {
+        return this.kids.remove(kid);
+    }
+
 }
