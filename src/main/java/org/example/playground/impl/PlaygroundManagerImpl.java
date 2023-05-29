@@ -5,6 +5,7 @@ import org.example.playground.domain.PlaySite;
 import org.example.playground.interfaces.PlaygroundManager;
 import org.example.playground.repository.KidRepository;
 import org.example.playground.repository.PlaySiteRepository;
+import org.example.playground.service.PlaySiteFactoryProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,16 +13,18 @@ import java.util.*;
 
 @Component
 public class PlaygroundManagerImpl implements PlaygroundManager {
+    private final PlaySiteRepository playSiteRepository;
+    private final PlaySiteFactoryProvider factoryProvider;
+
     private KidRepository kidRepository;
-    private PlaySiteRepository playSiteRepository;
     private int totalVisitorCount;
 
     private static final int WAITING_TIME = 30; // Waiting time in minutes
 
     @Autowired
-    public PlaygroundManagerImpl(KidRepository kidRepository, PlaySiteRepository playSiteRepository) {
-        this.kidRepository = kidRepository;
+    public PlaygroundManagerImpl(PlaySiteRepository playSiteRepository, PlaySiteFactoryProvider factoryProvider) {
         this.playSiteRepository = playSiteRepository;
+        this.factoryProvider = factoryProvider;
     }
     @Override
     public boolean enqueueKid(String playSiteId, Kid kid) {
